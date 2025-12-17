@@ -1,1 +1,4 @@
+pyswisseph
+timezonefinder
+requests
 
