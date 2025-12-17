@@ -1,5 +1,0 @@
-{
-  "functions": {
-    "api/ascendant.js": { "maxDuration": 10 }
-  }
-}
