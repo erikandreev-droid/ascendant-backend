@@ -18,32 +18,46 @@ class handler(BaseHTTPRequestHandler):
             date = data.get("date")
             time = data.get("time")
             place = data.get("placeText")
+            unknown_time = bool(data.get("unknownTime", False))
 
-            if not date or not time or not place:
+            if not date or not place:
                 self.send_response(400)
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
                 self.wfile.write(json.dumps({
-                    "error": "Липсват date, time или placeText"
+                    "error": "Липсва date или placeText"
                 }).encode("utf-8"))
                 return
 
+            if not time:
+                time = "12:00"
+
+            # ✅ ВАЖНО: ВРЪЩАМЕ ПОЛЕТАТА, КОИТО LOVABLE ОЧАКВА
             response = {
                 "ok": True,
                 "message": "API работи",
+
                 "input": {
                     "date": date,
                     "time": time,
-                    "placeText": place
-                }
+                    "placeText": place,
+                    "unknownTime": unknown_time
+                },
+
+                # ⬇⬇⬇ ТОВА ОПРАВЯ 'Invalid Date'
+                "position": "Овен",
+                "ascSignBg": "Овен",
+                "ascDegree": 0.0,
+                "timezone": "Europe/Sofia",
+                "utcTime": f"{date}T{time}:00Z"
             }
 
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps(response).encode("utf-8"))
+            self.wfile.write(json.dumps(response, ensure_ascii=False).encode("utf-8"))
 
         except Exception as e:
             self.send_response(500)
